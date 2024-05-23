@@ -3,23 +3,26 @@
 import cv2
 import glob
 import argparse
+from tqdm import tqdm
 
 def image2video(nfile, output_file, frames):
     img_array = []
     size = None
-    for filename in sorted(glob.glob(nfile+'*.jpeg')):
+    print('loading files...')
+    for filename in tqdm(sorted(glob.glob(nfile+'*.jpeg'))):
         img = cv2.imread(filename)
         height, width, layers = img.shape
         size = (width,height)
         img_array.append(img)
-        print('load file '+filename)
-     
+        #print('load file '+filename)
+    print('loaded all files')
     out = cv2.VideoWriter(output_file,cv2.VideoWriter_fourcc(*'DIVX'), frames, size)
      
-    for i in range(len(img_array)):
+    print(f'writing to {output_file}....')
+    for i in tqdm(range(len(img_array))):
         out.write(img_array[i])
-        print('writing...',i)
     out.release()
+    print('exported.')
 
 
 def main(args):
@@ -31,7 +34,7 @@ def main(args):
     if args.input:
         input = args.input
     if args.frames:
-        frames = args.frames
+        frames = int(args.frames)
     else:
         frames = 25
     image2video(input, output_file=output, frames = frames)
